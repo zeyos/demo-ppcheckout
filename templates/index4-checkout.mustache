@@ -1,0 +1,96 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+      <title>Simple Shop</title>
+      <meta name="description" content="Simple PayPal Checkout for ZeyOS">
+
+      <!-- Bootstrap -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+      <!-- Custom CSS -->
+      <link rel="stylesheet" href="assets/css/main.css">
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <h1>My Awesome Shop</h1>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#cart" id="cartBtn">
+      <i class="ion-android-cart"></i> Shopping cart
+    </button>
+
+    {{#order}}
+      <div class="container">
+        <div class="alert alert-success" role="alert">
+          <h3>Order successful</h3>
+          <p>Your order number is <b>{{transactionnum}}</b>.</p>
+        </div>
+      </div>
+    {{/order}}
+
+    <div class="container">
+      <div class="row">
+        {{#items}}
+          <div class="col-md-4">
+            <figure class="cartitem" data-name="{{name}}" data-price="{{sellingprice}}" data-item="{{ID}}">
+              <img src="{{baseurl}}{{ID}}/_image" alt="{{name}}" />
+              <figcaption>
+                <h3>{{name}}</h3>
+                <p>{{description}}</p>
+                <div class="price">
+                  {{#regularprice}}<s>{{regularprice}}</s>{{/regularprice}}
+                  {{sellingprice}}
+                </div>
+              </figcaption><i class="ion-android-cart"></i>
+            </figure>
+          </div>
+        {{/items}}
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="cart" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <form method="POST">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Shopping cart</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table" id="itemsTable">
+                <tr>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Amount</th>
+                </tr>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="submit" id="btnCheckout" class="btn btn-primary" disabled><span class="glyphicon glyphicon-shopping-cart"></span> Checkout</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!--  Include the application JavaScript -->
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,12 @@
+{
+  "name": "zeyos/ppcheckout",
+  "description": "A simple PayPal checkout for ZeyOS",
+  "license": "GPL",
+  "require": {
+    "php": ">=5.6.0",
+    "zeyos/rest": "*",
+    "mustache/mustache": "*",
+    "paypal/rest-api-sdk-php": "*"
+  }
+}
+
