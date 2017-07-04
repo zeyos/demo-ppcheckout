@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ixml SYSTEM "http://www.ixmldev.com/schema/ixml.dtd">
+<ixml>
+	<global var="RES" />
+	
+	<rest:server>
+		<!-- 
+			Get the product list
+		-->
+		<rest:resource route="/" method="GET">
+			<try>
+				<db:select var_result="RES.result" type="assoc">
+					<db:fields>
+						<db:field>i.ID</db:field>
+						<db:field>i.name</db:field>
+						<db:field>i.description</db:field>
+						<db:field>i.sellingprice</db:field>
+						<db:field>i.taxrate</db:field>
+						<db:field>i.picbinfile</db:field>
+					</db:fields>
+					<db:table alias="i">items</db:table>
+					<db:join>
+						<db:inner alias="t" table="tags">
+							<db:is field="t.entity">items</db:is>
+							<db:is field1="t.index" field2="i.ID" />
+						</db:inner>
+					</db:join>
+					<db:is field="i.visiblity">0</db:is>
+					<db:is field="t.name">Shop</db:is>
+					<db:orderby>
+						<db:orderfield>i.name</db:orderfield>
+					</db:orderby>
+				</db:select>
+			<catch var="error">
+				<set var="RES.error">$error</set>
+			</catch>
+			</try>
+		</rest:resource>
+
+		<!-- 
+			The the product details
+			
+			@param Int ID	
+		-->
+		<rest:resource route="/:ID" method="GET">
+			<db:get var="RES.result" id="$ID" entity="items" />
+
+			<if value1="$RES.result.ID">
+				<error>Item not found: $ID</error>
+			</if>
+		</rest:resource>
+
+		<!-- 
+			The the product image
+			
+			@param Int ID
+		-->
+		<rest:resource route="/:ID/_image" method="GET">
+			<db:get var="item" id="$ID" entity="items">
+			 	<db:field>picbinfile</db:field>
+			</db:get>
+
+			<header>Content-type: application/octet-stream</header>
+
+			<!-- Return a placeholder (Upload a new image resource) -->
+			<if value1="$item.picbinfile">
+				<exit>
+					<include id=".placeholder" />
+				</exit>
+			</if>
+
+			<exit>
+				<bin:read id="$item.picbinfile" />
+			</exit>
+		</rest:resource>
+		
+		<!--
+			Create a new order for the product
+		
+			@param Array items
+			@result Array {transactionnum: String, netamount: Float, tax: Float, items: Array}
+		-->
+		<rest:resource route="/" method="POST">
+			<!-- Check if the request contains any items -->
+			<is var="REQUEST.items" type="non-array">
+				<error>Parameter items not found. Array expected</error>
+			</is>
+			
+			<!-- Build the items array for the transaction -->
+			<array var="RES.result.items" />
+			<set var="RES.result.netamount">0</set>
+			<set var="RES.result.tax">0</set>
+			<foreach var="REQUEST.items" var_value="ID">
+				<set var="amount">1</set>
+				
+				<!-- Check if the item exists -->
+				<db:get var="item" id="$ID" entity="items" />
+				<if value1="$item.ID">
+					<error>Item not found: $ID</error>
+				</if>
+	
+				<!-- Build the items array -->
+				<array var="RES.result.items[]">
+					<item key="type">0</item>
+					<item key="subindex">0</item>
+					<item key="name">$item.name</item>
+					<item key="manufacturer">$item.manufacturer</item>
+					<item key="itemnum">$item.itemnum</item>
+					<item key="barcode">$item.barcode</item>
+					<item key="itemtype">$item.type</item>
+					<item key="unit">$item.unit</item>
+					<item key="amount">$amount</item>
+					<item key="amounttaken">0</item>
+					<item key="sellingprice">$item.sellingprice</item>
+					<item key="purchaseprice">0</item>
+					<item key="rebate">0</item>
+					<item key="discount">0</item>
+					<item key="discount2">0</item>
+					<item key="taxrate">$item.taxrate</item>
+					<item key="weight">$item.weight</item>
+					<item key="item">$item.ID</item>
+					<array key="transactions" />
+					<array key="references" />
+				</array>
+				
+				<!-- Aggregate the net amount -->
+				<set var="RES.result.netamount">$($RES.result.netamount + $item.sellingprice * $amount)</set>
+				<!-- Calculate the tax -->
+				<set var="RES.result.tax">$($RES.result.tax + $item.sellingprice * $amount * $item.taxrate / 100)</set>
+			</foreach>
+			
+			<!-- Get the order number -->
+			<numformat:next name="billing_ordernum" var="RES.result.transactionnum" />
+		</rest:resource>
+		
+		<!--
+			Create a new order for the product
+		
+			@param Array items
+			@param String transactionnum
+			@result Array {ID: Int, netamount: Float, tax: Float, items: Array}
+		-->
+		<rest:resource route="/:transactionnum" method="POST">
+			<db:transaction>
+				<set var="RES.result.netamount">0</set>
+				<set var="RES.result.tax">0</set>
+				<foreach var="REQUEST.items" var_value="item">
+					<!-- Aggregate the net amount -->
+					<set var="RES.result.netamount">$($RES.result.netamount + $item.sellingprice * $amount)</set>
+					<!-- Calculate the tax -->
+					<set var="RES.result.tax">$($RES.result.tax + $item.sellingprice * $amount * $item.taxrate / 100)</set>
+				</foreach>
+				<set var="RES.result.transactionnum">$transactionnum</set>
+				
+				<!-- Create the transaction -->
+				<!-- See http://schema.zeyos.com/tables/transactions.html for Schema details --> 
+				<db:set entity="transactions" var="RES.result.ID">
+					<db:data field="transactionnum">$transactionnum</db:data>
+					<db:data field="date">$DATENOW</db:data>
+					<!-- <db:data field="account"></db:data> -->
+					<db:data field="type">1</db:data>
+					<db:data field="status">0</db:data>
+					<db:data field="currency">EUR</db:data>
+					<db:data field="netamount">$RES.result.netamount</db:data>
+					<db:data field="tax">$RES.result.tax</db:data>
+					<db:data field="items">
+						<encode:json var="REQUEST.items" />
+					</db:data>
+				</db:set>
+			</db:transaction>
+		</rest:resource>
+	</rest:server>
+
+	<header>Content-type: application/json</header>
+	<output>
+		<encode:json var="RES" />
+	</output>
+</ixml>
