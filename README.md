@@ -13,12 +13,11 @@ In this example we will show you how to add a simple checkout widget to your web
 
 Before we switch into coding-mode, let's head over to ZeyOS and create some products. Since we don't want to offer all our products on our shop, we first create a category called "Shop".
 
-![Create a category](//raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/create-category.gif)
+![Create a category](https://raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/create-category.gif)
 
 Next, create some demo items and add them to the category:
 
-![Create a new item](//raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/create-item.gif)
-
+![Create a new item](https://raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/create-item.gif)
 
 ## Step 2: Basic page setup
 
@@ -132,7 +131,7 @@ echo $m->render(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'templates' . 
 
 This is the result:
 
-![Static template](//raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/index1-template.png)
+![Static template](https://raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/index1-template.png)
 
 
 ## Step 3: Retrieve items from ZeyOS
@@ -321,7 +320,7 @@ At the moment we are rendering the shop with a static array of items - next thin
 
 Configure this script as a **remote call service**:
 
-![Shop API](//raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/shop-api.png)
+![Shop API](https://raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/shop-api.png)
 
 This REST service does three things:
 
@@ -331,7 +330,7 @@ This REST service does three things:
 
 You can test the request yourself if you simply call the API URL in your web browser
 
-![API Result](//raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/json-result.png)
+![API Result](https://raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/json-result.png)
 
 Let's integrate this service into our existing PHP script:
 
@@ -379,7 +378,7 @@ echo $m->render(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'templates' . 
 
 We will now get our list of items in the shop:
 
-![Shop Result](//raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/shop-result.png)
+![Shop Result](https://raw.githubusercontent.com/zeyosinc/demo-ppcheckout/master/docs/shop-result.png)
 
 
 ## Step 4: Place the order in ZeyOS
